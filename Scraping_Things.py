@@ -9,7 +9,7 @@ import global_var
 from InsertOnDatabase import insert_in_Local, create_filename
 import requests
 import html
-from googletrans import Translator
+# from googletrans import Translator
 import dateparser
 
 
@@ -391,15 +391,8 @@ def Scrap_data(browser, get_htmlSource):
                         for SegIndex in range(len(SegFeild)):
                             print(SegIndex, end=' ')
                             print(SegFeild[SegIndex])
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&quot;", "\"")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&QUOT;", "\"")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&nbsp;", " ")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&NBSP;", " ")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&amp;amp", "&")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&AMP;AMP", "&")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&amp;", "&")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("&AMP;", "&")
-                            SegFeild[SegIndex] = SegFeild[SegIndex].replace("'", "''")
+                            SegFeild[SegIndex] = html.unescape(str(SegFeild[SegIndex]))
+                            SegFeild[SegIndex] = str(SegFeild[SegIndex]).replace("'", "''")
                         a = 1
                         if len(SegFeild[19]) >= 200:
                             SegFeild[19] = str(SegFeild[19])[:200] + '...'
@@ -407,8 +400,7 @@ def Scrap_data(browser, get_htmlSource):
                     except Exception as e:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                        print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,
-                              "\n", exc_tb.tb_lineno)
+                        print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,"\n", exc_tb.tb_lineno)
                         a = 0
         else:
             print(" ♥ Deadline was not given ♥ ")
@@ -428,6 +420,7 @@ def check_date(get_htmlSource, SegFeild):
             currentdate = time.strptime(date2, "%Y-%m-%d")
             if deadline > currentdate:
                 insert_in_Local(get_htmlSource, SegFeild)
+                print('Live Tender')
             else:
                 print("Tender Expired")
                 global_var.expired += 1
@@ -437,5 +430,4 @@ def check_date(get_htmlSource, SegFeild):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname, "\n",
-              exc_tb.tb_lineno)
+        print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname, "\n",exc_tb.tb_lineno)

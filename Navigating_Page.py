@@ -11,29 +11,28 @@ def Local_connection_links():
     a = 0
     while a == 0:
         try:
-            File_Location = open(
-                "D:\\0 PYTHON EXE SQL CONNECTION & DRIVER PATH\\zakup_sk_kz\\Location For Database & Driver.txt",
-                "r")
-            TXT_File_AllText = File_Location.read()
+            # File_Location = open(
+            #     "D:\\0 PYTHON EXE SQL CONNECTION & DRIVER PATH\\zakup_sk_kz\\Location For Database & Driver.txt",
+            #     "r")
+            # TXT_File_AllText = File_Location.read()
 
-            Local_host = str(TXT_File_AllText).partition("Local_host_link=")[2].partition(",")[0].strip()
-            Local_user = str(TXT_File_AllText).partition("Local_user_link=")[2].partition(",")[0].strip()
-            Local_password = str(TXT_File_AllText).partition("Local_password_link=")[2].partition(",")[0].strip()
-            Local_db = str(TXT_File_AllText).partition("Local_db_link=")[2].partition(",")[0].strip()
-            Local_charset = str(TXT_File_AllText).partition("Local_charset_link=")[2].partition("\")")[0].strip()
+            # Local_host = str(TXT_File_AllText).partition("Local_host_link=")[2].partition(",")[0].strip()
+            # Local_user = str(TXT_File_AllText).partition("Local_user_link=")[2].partition(",")[0].strip()
+            # Local_password = str(TXT_File_AllText).partition("Local_password_link=")[2].partition(",")[0].strip()
+            # Local_db = str(TXT_File_AllText).partition("Local_db_link=")[2].partition(",")[0].strip()
+            # Local_charset = str(TXT_File_AllText).partition("Local_charset_link=")[2].partition("\")")[0].strip()
 
-            connection = pymysql.connect(host=str(Local_host),
-                                         user=str(Local_user),
-                                         password=str(Local_password),
-                                         db=str(Local_db),
-                                         charset=str(Local_charset),
+            connection = pymysql.connect(host='185.142.34.92',
+                                         user='ams',
+                                         password='TgdRKAGedt%h',
+                                         db='tenders_db',
+                                         charset='utf8',
                                          cursorclass=pymysql.cursors.DictCursor)
             return connection
         except pymysql.connect  as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,
-                  "\n", exc_tb.tb_lineno)
+            print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,"\n", exc_tb.tb_lineno)
             a = 0
             time.sleep(10)
 
@@ -45,7 +44,7 @@ def Collect_Link():
             Links_List = []
             mydb_Local = Local_connection_links()
             mycursorLocal = mydb_Local.cursor()
-            mycursorLocal.execute("SELECT `doc_links` FROM `AMS_Master`.`zakupskkz_temptbl` ORDER BY ID DESC LIMIT "+str(global_var.Number_Of_Links)+"")
+            mycursorLocal.execute(f"SELECT `doc_links` FROM `zakupskkz_temptbl` ORDER BY ID DESC LIMIT {str(global_var.Number_Of_Links)}")
             rows = mycursorLocal.fetchall()
             for row in rows:
                 links = "%s" % (row["doc_links"])
@@ -64,10 +63,11 @@ def Collect_Link():
 
 
 def navigating_pages(Collected_T_Number):
-    File_Location = open("D:\\0 PYTHON EXE SQL CONNECTION & DRIVER PATH\\zakup_sk_kz\\Location For Database & Driver.txt", "r")
-    TXT_File_AllText = File_Location.read()
-    Chromedriver = str(TXT_File_AllText).partition("Driver=")[2].partition("\")")[0].strip()
-    browser = webdriver.Chrome(executable_path=str(Chromedriver))
+    # File_Location = open("D:\\0 PYTHON EXE SQL CONNECTION & DRIVER PATH\\zakup_sk_kz\\Location For Database & Driver.txt", "r")
+    # TXT_File_AllText = File_Location.read()
+    # Chromedriver = str(TXT_File_AllText).partition("Driver=")[2].partition("\")")[0].strip()
+    # browser = webdriver.Chrome(executable_path=str(Chromedriver))
+    browser = webdriver.Chrome(executable_path=str(f"C:\\chromedriver.exe"))
     browser.maximize_window()
     a = 0
     while a == 0:
@@ -122,9 +122,7 @@ def navigating_pages(Collected_T_Number):
         except Exception as e:
             exc_type , exc_obj , exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e) , "\n" , exc_type , "\n" , fname ,
-                  "\n" , exc_tb.tb_lineno)
-
+            print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e) , "\n" , exc_type , "\n" , fname ,"\n" , exc_tb.tb_lineno)
             a = 0
 
 
@@ -136,7 +134,7 @@ def DeleteLink_From_Database(href):
         try:
             mydb_Local = Local_connection_links()
             mycursorLocal = mydb_Local.cursor()
-            mycursorLocal.execute("DELETE FROM `AMS_Master`.`zakupskkz_temptbl` WHERE `doc_links` = '"+str(href)+"'")
+            mycursorLocal.execute(f"DELETE FROM `zakupskkz_temptbl` WHERE `doc_links` = '{str(href)}'")
             mydb_Local.commit()
             global_var.Delete_From_database += 1
             print("Link Delete From Table")
@@ -149,7 +147,6 @@ def DeleteLink_From_Database(href):
             mydb_Local.close()
             a5 = 1
         except Exception as e:
-
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname, "\n",exc_tb.tb_lineno)

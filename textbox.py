@@ -9,13 +9,13 @@ def Local_connection_links():
     a = 0
     while a == 0:
         try:
-            connection = pymysql.connect(host='192.168.0.100',
+            connection = pymysql.connect(host='185.142.34.92',
                                          user='ams',
-                                         password='amsbind',
-                                         db='AMS_Master',
+                                         password='TgdRKAGedt%h',
+                                         db='tenders_db',
                                          charset='utf8',
                                          cursorclass=pymysql.cursors.DictCursor)
-            sql = 'SELECT COUNT(*) FROM `AMS_Master`.`zakupskkz_temptbl`'
+            sql = 'SELECT COUNT(*) FROM `zakupskkz_temptbl`'
             cursor = connection.cursor()
             cursor.execute(sql)
             Links : str = cursor.fetchall()
@@ -24,8 +24,7 @@ def Local_connection_links():
         except pymysql.connect  as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,
-                  "\n", exc_tb.tb_lineno)
+            print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,"\n", exc_tb.tb_lineno)
             a = 0
             time.sleep(10)
 
