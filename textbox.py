@@ -59,7 +59,7 @@ class MainWindow(wx.Frame):
         Close.Bind(wx.EVT_BUTTON, self.onClose)
 
     def inserttext(self, event):
-        global_var.Number_Of_Links = self.box1.GetLineText(1)
+        global_var.Number_Of_Links = self.box1.GetValue()
         print("Number OF Link Selected: ", global_var.Number_Of_Links)
 
     def mouseclick(self, event):

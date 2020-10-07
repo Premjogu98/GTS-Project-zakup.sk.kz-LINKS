@@ -68,7 +68,10 @@ def navigating_pages(Collected_T_Number):
     # Chromedriver = str(TXT_File_AllText).partition("Driver=")[2].partition("\")")[0].strip()
     # browser = webdriver.Chrome(executable_path=str(Chromedriver))
     browser = webdriver.Chrome(executable_path=str(f"C:\\chromedriver.exe"))
+    browser.get('https://translate.google.co.in/')
     browser.maximize_window()
+    browser.execute_script("window.open('');")
+    browser.switch_to.window(browser.window_handles[1])
     a = 0
     while a == 0:
         try:
@@ -107,7 +110,7 @@ def navigating_pages(Collected_T_Number):
                             b = 1
                     except:
                         b = 0
-                DeleteLink_From_Database(href)
+                    DeleteLink_From_Database(href)
 
             ctypes.windll.user32.MessageBoxW(0, "Total: " + str(global_var.Total) + "\n""Duplicate: " + str(
                 global_var.duplicate) + "\n""Expired: " + str(global_var.expired) + "\n""Inserted: " + str(

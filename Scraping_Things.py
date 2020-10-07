@@ -46,39 +46,40 @@ def Scrap_data(browser, get_htmlSource):
         SegFeild.append('')
     new_get_htmlSource: str = get_htmlSource.replace("\n", "")
     new_get_htmlSource: str = new_get_htmlSource.replace("<!---->", "").replace("&quot;", "\"").replace("&QUOT;","\"").replace("&nbsp;", " ").replace("&NBSP;", " ").replace("&amp;amp", "&").replace("&AMP;AMP", "&").replace("&amp;", "&").replace("&AMP;", "&").replace("&;amp", "&").replace("&;AMP", "&").replace(" ng-if=\"!isjson\"", "")
-    new_get_htmlSource: str = re.sub(' +', ' ', new_get_htmlSource)
+    new_get_htmlSource: str = re.sub('\s+', ' ', new_get_htmlSource)
 
     try:
-        # Due_date = re.search(r'(?<=jhitranslate="main.dialog.acceptanceEndDateTime">).*?(?=</div> </div> <div)',
-        #                          new_get_htmlSource).group(0)
+        # Due_date = re.search(r'(?<=jhitranslate="main.dialog.acceptanceEndDateTime">).*?(?=</div> </div> <div)', new_get_htmlSource).group(0)
         # Due_date = re.search(r'(?<=class="m-rangebox__date">).*?(?=</div>)', Due_date).group(0)
-        time.sleep(3)
+        # time.sleep(3)
         Due_date = ''
-        for Due_Date in browser.find_elements_by_xpath('//*[@class="m-rangebox__date"]'):
-            Due_Date = Due_Date.get_attribute('innerText')
-            Due_Date = Due_Date.replace('.','').replace('г','')
-            Due_Date = Due_Date.partition(",")[0].strip()
-            Due_date = f"{Due_date},{Due_Date}"
-        Due_date = Due_date.lstrip(',')
-        Due_date = Due_date.partition(",")[2].strip().replace('г','').replace(' ','.').lower()
-
+        Due_Date_b = browser.find_elements_by_xpath('//*[@class="m-rangebox__date"]')
+        if len(Due_Date_b) == 2:
+            Due_Date = Due_Date_b[1].get_attribute('innerText')
+            Due_Date = Due_Date.replace('.','').replace('г','').replace(',','').lower().strip()
+            Due_date = re.sub('\s+', ' ', Due_Date)
         if Due_date != "":
-
-            # translator = Translator()
-            # translator_text = translator.translate(str(Due_date))
-            # Due_date = translator_text.text
-            # Due_date = Translate(str(Due_date))
-            # Due_date = Due_date.replace('январь', '-january-').replace('февраль', '-february-') \
-            #     .replace('марш', '-march-').replace('апреля', '-april-').replace('может', '-may-').replace('июнь', '-june-') \
-            #     .replace('июль', '-july-').replace('августейший', '-august-').replace('сентябрь', '-september-') \
-            #     .replace('октябрь', '-october-').replace('ноябрь', '-november-').replace('Декабрь', '-december-')
-
             Due_date = Due_date.replace("p.m.", "").strip()
             Due_date = Due_date.replace("a.m.", "").strip()
-            # datetime_object = datetime.strptime(Due_date, '%d.%B.%Y')
-            # mydate = datetime_object.strftime("%Y-%m-%d")
-            Due_date = dateparser.parse(str(Due_date))
-            mydate = Due_date.strftime("%Y-%m-%d")
+            Due_date = Due_date[:-5].strip()
+            datetime = dateparser.parse(str(Due_date))
+            if datetime is None or datetime == '':
+                browser.switch_to.window(browser.window_handles[0])
+                for i in browser.find_elements_by_xpath('//*[@id="source"]'):
+                    i.clear()
+                    time.sleep(2)
+                    i.send_keys(str(Due_date))
+                    break
+                time.sleep(2)
+                for Due_date in browser.find_elements_by_xpath('//*[@class="tlid-translation translation"]'):
+                    Due_date = Due_date.get_attribute('innerText').strip()
+                    break
+                browser.switch_to.window(browser.window_handles[1])
+                datetime = dateparser.parse(str(Due_date))
+                mydate = datetime.strftime("%Y-%m-%d")
+            else:   
+                mydate = datetime.strftime("%Y-%m-%d")
+            
             SegFeild[24] = mydate.strip()
             a = 0
             while a == 0:
@@ -97,19 +98,6 @@ def Scrap_data(browser, get_htmlSource):
                         Address = ""
                         Phone = ""
 
-                        # Address = str(new_get_htmlSource).partition('МЕСТО ПОСТАВКИ</span></div>')[2].partition("</span> </div> </div> <div")[0].strip()
-                        # clean = re.compile('<.*?>')
-                        # Address = re.sub(clean, '', Address).replace(",", " ")
-                        # Address = re.sub(' +', ' ', Address).strip()
-                        # if Address != "":
-                        #     Address_list = []
-                        #     Address = [Address[idx:idx + 10] for idx, val in enumerate(Address) if idx % 10 == 0]
-                        #     for Address in Address:
-                        #         Address = Translate(Address)
-                        #         Address.append(Address)
-                        #     for Address_list in Address_list:
-                        #         Address += Address_list
-                        #     Address = string.capwords(str(Address))
                         Address_test = ''
                         Address_test = str(new_get_htmlSource).partition('МЕСТО ПОСТАВКИ</span></div>')[2].partition("</span> </div> </div> <div")[0].strip()
                         clean = re.compile('<.*?>')
@@ -359,14 +347,15 @@ def Scrap_data(browser, get_htmlSource):
                             pass
 
                         try:
-                            total_amount = re.search(r'(?<=Общая сумма лотов</span></div>).*?(?=</div> </div>)',
-                                                     new_get_htmlSource).group(0)
+                            total_amount = re.search(r'(?<=Общая сумма лотов</span></div>).*?(?=</div> </div>)',new_get_htmlSource).group(0)
                             clean = re.compile('<.*?>')
                             total_amount = re.sub(clean, '', total_amount).strip()
+                            total_amount = total_amount.replace(' ','').replace('₸','').replace(',','.')
                             SegFeild[20] = total_amount.strip()
                         except:
                             pass
-
+                        if str(SegFeild[20]) != '':
+                            SegFeild[21] = 'KZT'
                         # try:
                         #     Due_date = re.search(r'(?<=class="m-rangebox__date">).*?(?=</div>)', new_get_htmlSource).group(0)
                         #     Due_date = Due_date.replace("p.m.", "").strip()
@@ -388,6 +377,10 @@ def Scrap_data(browser, get_htmlSource):
                         # Source Name
                         SegFeild[31] = 'zakup.sk.kz'
 
+                        SegFeild[42] = SegFeild[7]
+
+                        SegFeild[43] = ''
+
                         for SegIndex in range(len(SegFeild)):
                             print(SegIndex, end=' ')
                             print(SegFeild[SegIndex])
@@ -405,9 +398,13 @@ def Scrap_data(browser, get_htmlSource):
         else:
             print(" ♥ Deadline was not given ♥ ")
             global_var.deadline_Not_given += 1
-    except:
-        print(" ♥ Deadline was not given ♥ ")
-        global_var.deadline_Not_given += 1
+    # except:
+    #     print(" ♥ Deadline was not given ♥ ")
+    #     global_var.deadline_Not_given += 1
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print("Error ON : ", sys._getframe().f_code.co_name + "--> " + str(e), "\n", exc_type, "\n", fname,"\n", exc_tb.tb_lineno)
 
 
 def check_date(get_htmlSource, SegFeild):
